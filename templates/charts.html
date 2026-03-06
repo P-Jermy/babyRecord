@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}统计图表 - 小彭健康记录{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-bar-chart-line"></i> 数据统计图表</h2>
+
+<div class="row">
+    <!-- 喂养趋势图 -->
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> 每日喂养量趋势</h5>
+            </div>
+            <div class="card-body">
+                {{ feeding_trend_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 喂养占比饼图 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> 喂养方式占比</h5>
+            </div>
+            <div class="card-body">
+                {{ feeding_pie_html|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- 生长发育曲线 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-rulers"></i> 生长发育曲线</h5>
+            </div>
+            <div class="card-body">
+                {{ growth_chart_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="/" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> 返回首页
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
