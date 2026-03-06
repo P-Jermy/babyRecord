@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 小彭健康记录{% endblock %}
+
+{% block content %}
+<!-- 宝宝信息 -->
+<div class="baby-info">
+    <div class="baby-avatar">👶</div>
+    <h2>{{ baby_name }}</h2>
+    <p class="text-muted mb-0">
+        出生日期: {{ baby_birthday }} | 
+        <span class="badge bg-primary">月龄: {{ age_months }} 个月</span>
+    </p>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number">{{ total_feedings }}</div>
+            <div class="stat-label">喂养记录次数</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number">{{ total_milk }}</div>
+            <div class="stat-label">总喂养量 (ml)</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number">
+                {% if latest_growth %}
+                    {{ "%.1f"|format(latest_growth.weight_kg) }}kg
+                {% else %}
+                    --
+                {% endif %}
+            </div>
+            <div class="stat-label">当前体重</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 添加喂养记录 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle"></i> 添加喂养记录</h5>
+            </div>
+            <div class="card-body">
+                <form action="/add_feeding" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">日期</label>
+                        <input type="date" class="form-control" name="date" value="{{ '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">时间</label>
+                        <input type="time" class="form-control" name="time" value="08:00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">喂养方式</label>
+                        <select class="form-select" name="type" required>
+                            <option value="母乳">母乳</option>
+                            <option value="瓶喂母乳">瓶喂母乳</option>
+                            <option value="瓶喂奶粉">瓶喂奶粉</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">奶量 (ml)</label>
+                        <input type="number" class="form-control" name="amount_ml" min="0" step="5" placeholder="请输入奶量" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">备注</label>
+                        <input type="text" class="form-control" name="notes" placeholder="可选备注">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">提交记录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加生长发育记录 -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-rulers"></i> 添加生长发育记录</h5>
+            </div>
+            <div class="card-body">
+                <form action="/add_growth" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">测量日期</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">身高 (cm)</label>
+                        <input type="number" class="form-control" name="height_cm" min="0" step="0.1" placeholder="请输入身高" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">体重 (kg)</label>
+                        <input type="number" class="form-control" name="weight_kg" min="0" step="0.1" placeholder="请输入体重" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">头围 (cm)</label>
+                        <input type="number" class="form-control" name="head_circumference_cm" min="0" step="0.1" placeholder="请输入头围" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">备注</label>
+                        <input type="text" class="form-control" name="notes" placeholder="可选备注">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">提交记录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 最近记录 -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> 最近喂养记录</h5>
+            </div>
+            <div class="card-body">
+                {% if feeding_df %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>时间</th>
+                                <th>方式</th>
+                                <th>奶量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in feeding_df %}
+                            <tr>
+                                <td>{{ row.date[:10] }}</td>
+                                <td>{{ row.time }}</td>
+                                <td>{{ row.type }}</td>
+                                <td>{{ row.amount_ml }} ml</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">暂无记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> 最近生长发育</h5>
+            </div>
+            <div class="card-body">
+                {% if growth_df %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>身高</th>
+                                <th>体重</th>
+                                <th>头围</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in growth_df %}
+                            <tr>
+                                <td>{{ row.date[:10] }}</td>
+                                <td>{{ row.height_cm }} cm</td>
+                                <td>{{ row.weight_kg }} kg</td>
+                                <td>{{ row.head_circumference_cm }} cm</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">暂无记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.valueAsDate = new Date();
+    });
+</script>
+{% endblock %}
